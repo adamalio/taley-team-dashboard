@@ -43,7 +43,7 @@ declare namespace google {
     }
   }
 }
-declare function gapi: never;
+// gapi is loaded dynamically
 declare namespace gapi {
   function load(api: string, callback: () => void): void;
 }
