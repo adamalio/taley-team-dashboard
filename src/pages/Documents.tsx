@@ -59,13 +59,14 @@ const Documents = () => {
         }
         tokenClient.callback = (resp) => {
           if (resp.error) {
-            reject(resp);
+            accessToken = null;
+            reject(new Error(resp.error));
             return;
           }
           accessToken = resp.access_token;
           resolve(resp.access_token);
         };
-        tokenClient.requestAccessToken({ prompt: "" });
+        tokenClient.requestAccessToken({ prompt: accessToken ? "" : "consent" });
       }),
     []
   );
