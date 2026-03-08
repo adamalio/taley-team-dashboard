@@ -16,6 +16,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import taleyLogo from "@/assets/taley-logo.png";
 
 const navItems = [
   { label: "Home", icon: Home, path: "/" },
@@ -46,19 +47,39 @@ const Sidebar = ({ collapsed, onToggle }: SidebarProps) => {
       )}
     >
       {/* Logo */}
-      <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-4">
+      <div className="flex h-16 items-center justify-between border-b border-sidebar-border px-3">
         {!collapsed && (
-          <span className="text-xl font-bold text-primary">Taley</span>
+          <div className="flex items-center gap-2">
+            <img src={taleyLogo} alt="Taley" className="h-10 w-10 object-contain" />
+            <span className="text-lg font-bold text-foreground">Taley</span>
+          </div>
+        )}
+        {collapsed && (
+          <img src={taleyLogo} alt="Taley" className="mx-auto h-9 w-9 object-contain" />
         )}
         <Button
           variant="ghost"
           size="icon"
           onClick={onToggle}
-          className="ml-auto h-8 w-8 text-sidebar-foreground hover:bg-sidebar-accent"
+          className={cn("h-7 w-7 text-sidebar-foreground hover:bg-sidebar-accent", collapsed && "hidden")}
         >
-          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          <ChevronLeft className="h-4 w-4" />
         </Button>
       </div>
+
+      {/* Expand button when collapsed */}
+      {collapsed && (
+        <div className="flex justify-center py-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onToggle}
+            className="h-7 w-7 text-sidebar-foreground hover:bg-sidebar-accent"
+          >
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
 
       {/* Navigation */}
       <nav className="flex-1 space-y-1 overflow-y-auto p-2">

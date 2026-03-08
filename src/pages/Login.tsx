@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/hooks/useTheme";
+import taleyLogo from "@/assets/taley-logo.png";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -15,7 +16,6 @@ const Login = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // No real auth yet — just navigate to dashboard
     navigate("/");
   };
 
@@ -32,7 +32,9 @@ const Login = () => {
 
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="mx-auto mb-4 text-3xl font-bold text-primary">Taley</div>
+          <div className="mx-auto mb-2">
+            <img src={taleyLogo} alt="Taley" className="mx-auto h-20 w-20 object-contain" />
+          </div>
           <CardTitle className="text-2xl">Anmelden</CardTitle>
           <CardDescription>
             Melde dich mit deinem Konto an, um fortzufahren.
