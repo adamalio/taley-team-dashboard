@@ -14,6 +14,8 @@ import { Progress } from '@/components/ui/progress';
 const Profile = () => {
   const { user } = useAuth();
   const { profile, isLoading, updateProfile, isUpdating } = useProfile();
+  const { uploadAvatar, isUploading, uploadProgress } = useAvatarUpload();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [fullName, setFullName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
