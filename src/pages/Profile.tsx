@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useProfile } from '@/hooks/useProfile';
+import { useAvatarUpload } from '@/hooks/useAvatarUpload';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,7 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Loader2, Save } from 'lucide-react';
+import { Loader2, Save, Upload, Camera } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
 const Profile = () => {
   const { user } = useAuth();
