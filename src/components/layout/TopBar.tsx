@@ -12,6 +12,7 @@ import {
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useProfile } from "@/hooks/useProfile";
 
 interface TopBarProps {
   onMobileMenuToggle: () => void;
@@ -20,19 +21,22 @@ interface TopBarProps {
 const TopBar = ({ onMobileMenuToggle }: TopBarProps) => {
   const { theme, toggleTheme } = useTheme();
   const { user, signOut } = useAuth();
+  const { profile } = useProfile();
   const navigate = useNavigate();
 
   const getUserInitials = () => {
-    if (!user) return "TU";
-    const name = user.user_metadata?.full_name || user.email || "";
-    if (user.user_metadata?.full_name) {
+    const name = profile?.full_name || user?.user_metadata?.full_name || user?.email || "";
+    if (profile?.full_name || user?.user_metadata?.full_name) {
       const parts = name.split(" ");
       return parts.length >= 2 
         ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
         : name.substring(0, 2).toUpperCase();
     }
-    return name.substring(0, 2).toUpperCase();
+    return name.substring(0, 2).toUpperCase() || "TU";
   };
+
+  const getAvatarUrl = () => profile?.avatar_url || user?.user_metadata?.avatar_url;
+  const getDisplayName = () => profile?.full_name || user?.user_metadata?.full_name || "Benutzer";
 
   const handleSignOut = async () => {
     await signOut();
@@ -79,7 +83,7 @@ const TopBar = ({ onMobileMenuToggle }: TopBarProps) => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Avatar className="h-9 w-9 cursor-pointer">
-              <AvatarImage src={user?.user_metadata?.avatar_url} />
+              <AvatarImage src={getAvatarUrl()} />
               <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
                 {getUserInitials()}
               </AvatarFallback>
@@ -88,7 +92,7 @@ const TopBar = ({ onMobileMenuToggle }: TopBarProps) => {
           <DropdownMenuContent align="end" className="w-56">
             <div className="px-2 py-1.5">
               <p className="text-sm font-medium">
-                {user?.user_metadata?.full_name || "Benutzer"}
+                {getDisplayName()}
               </p>
               <p className="text-xs text-muted-foreground truncate">
                 {user?.email}
