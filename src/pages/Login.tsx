@@ -12,11 +12,14 @@ import taleyLogo from "@/assets/taley-logo.png";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isRegister, setIsRegister] = useState(false);
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
-  const { signInWithGoogle, signInWithEmail, user } = useAuth();
+  const { signInWithGoogle, signInWithEmail, signUpWithEmail, user } = useAuth();
 
   useEffect(() => {
     if (user) {
@@ -27,14 +30,33 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
     setLoading(true);
-    
-    const { error } = await signInWithEmail(email, password);
-    
-    if (error) {
-      setError(error.message);
-      setLoading(false);
+
+    if (isRegister) {
+      if (password.length < 6) {
+        setError("Passwort muss mindestens 6 Zeichen lang sein.");
+        setLoading(false);
+        return;
+      }
+      if (password !== confirmPassword) {
+        setError("Passwörter stimmen nicht überein.");
+        setLoading(false);
+        return;
+      }
+      const { error } = await signUpWithEmail(email, password);
+      if (error) {
+        setError(error.message);
+      } else {
+        setSuccess("Registrierung erfolgreich! Bitte bestätige deine E-Mail-Adresse.");
+      }
+    } else {
+      const { error } = await signInWithEmail(email, password);
+      if (error) {
+        setError(error.message);
+      }
     }
+    setLoading(false);
   };
 
   const handleGoogleLogin = async () => {
@@ -58,9 +80,11 @@ const Login = () => {
           <div className="mx-auto mb-2">
             <img src={taleyLogo} alt="Taley" className="mx-auto h-20 w-20 object-contain" />
           </div>
-          <CardTitle className="text-2xl">Anmelden</CardTitle>
+          <CardTitle className="text-2xl">{isRegister ? "Registrieren" : "Anmelden"}</CardTitle>
           <CardDescription>
-            Melde dich mit deinem Konto an, um fortzufahren.
+            {isRegister 
+              ? "Erstelle ein neues Konto, um loszulegen." 
+              : "Melde dich mit deinem Konto an, um fortzufahren."}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -107,6 +131,11 @@ const Login = () => {
                   {error}
                 </div>
               )}
+              {success && (
+                <div className="rounded-md bg-primary/10 p-3 text-sm text-primary">
+                  {success}
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="email">E-Mail</Label>
                 <Input
@@ -127,15 +156,35 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  minLength={6}
                 />
               </div>
+              {isRegister && (
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Passwort bestätigen</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    minLength={6}
+                  />
+                </div>
+              )}
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Wird angemeldet..." : "Anmelden"}
+                {loading 
+                  ? (isRegister ? "Wird registriert..." : "Wird angemeldet...") 
+                  : (isRegister ? "Registrieren" : "Anmelden")}
               </Button>
               <p className="text-center text-sm text-muted-foreground">
-                Noch kein Konto?{" "}
-                <span className="cursor-pointer text-primary hover:underline">
-                  Registrieren
+                {isRegister ? "Bereits ein Konto?" : "Noch kein Konto?"}{" "}
+                <span 
+                  className="cursor-pointer text-primary hover:underline"
+                  onClick={() => { setIsRegister(!isRegister); setError(""); setSuccess(""); }}
+                >
+                  {isRegister ? "Anmelden" : "Registrieren"}
                 </span>
               </p>
             </form>
