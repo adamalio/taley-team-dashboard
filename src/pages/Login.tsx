@@ -12,11 +12,14 @@ import taleyLogo from "@/assets/taley-logo.png";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isRegister, setIsRegister] = useState(false);
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
-  const { signInWithGoogle, signInWithEmail, user } = useAuth();
+  const { signInWithGoogle, signInWithEmail, signUpWithEmail, user } = useAuth();
 
   useEffect(() => {
     if (user) {
@@ -27,14 +30,33 @@ const Login = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
     setLoading(true);
-    
-    const { error } = await signInWithEmail(email, password);
-    
-    if (error) {
-      setError(error.message);
-      setLoading(false);
+
+    if (isRegister) {
+      if (password.length < 6) {
+        setError("Passwort muss mindestens 6 Zeichen lang sein.");
+        setLoading(false);
+        return;
+      }
+      if (password !== confirmPassword) {
+        setError("Passwörter stimmen nicht überein.");
+        setLoading(false);
+        return;
+      }
+      const { error } = await signUpWithEmail(email, password);
+      if (error) {
+        setError(error.message);
+      } else {
+        setSuccess("Registrierung erfolgreich! Bitte bestätige deine E-Mail-Adresse.");
+      }
+    } else {
+      const { error } = await signInWithEmail(email, password);
+      if (error) {
+        setError(error.message);
+      }
     }
+    setLoading(false);
   };
 
   const handleGoogleLogin = async () => {
