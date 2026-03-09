@@ -80,9 +80,11 @@ const Login = () => {
           <div className="mx-auto mb-2">
             <img src={taleyLogo} alt="Taley" className="mx-auto h-20 w-20 object-contain" />
           </div>
-          <CardTitle className="text-2xl">Anmelden</CardTitle>
+          <CardTitle className="text-2xl">{isRegister ? "Registrieren" : "Anmelden"}</CardTitle>
           <CardDescription>
-            Melde dich mit deinem Konto an, um fortzufahren.
+            {isRegister 
+              ? "Erstelle ein neues Konto, um loszulegen." 
+              : "Melde dich mit deinem Konto an, um fortzufahren."}
           </CardDescription>
         </CardHeader>
         <CardContent>
