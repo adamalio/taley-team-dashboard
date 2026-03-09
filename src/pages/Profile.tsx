@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useProfile } from '@/hooks/useProfile';
+import { useAvatarUpload } from '@/hooks/useAvatarUpload';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,11 +8,14 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Loader2, Save } from 'lucide-react';
+import { Loader2, Save, Upload, Camera } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 
 const Profile = () => {
   const { user } = useAuth();
   const { profile, isLoading, updateProfile, isUpdating } = useProfile();
+  const { uploadAvatar, isUploading, uploadProgress } = useAvatarUpload();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
   const [fullName, setFullName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
@@ -74,17 +78,61 @@ const Profile = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Avatar Preview */}
+            {/* Avatar Preview & Upload */}
             <div className="flex items-center gap-4">
-              <Avatar className="h-20 w-20">
-                <AvatarImage src={avatarUrl} />
-                <AvatarFallback className="bg-primary text-primary-foreground text-xl font-semibold">
-                  {getInitials()}
-                </AvatarFallback>
-              </Avatar>
-              <div className="text-sm text-muted-foreground">
-                <p>Gib eine URL zu deinem Profilbild an.</p>
-                <p>Empfohlene Größe: 200x200 Pixel.</p>
+              <div className="relative group">
+                <Avatar className="h-20 w-20">
+                  <AvatarImage src={avatarUrl} />
+                  <AvatarFallback className="bg-primary text-primary-foreground text-xl font-semibold">
+                    {getInitials()}
+                  </AvatarFallback>
+                </Avatar>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="absolute inset-0 flex items-center justify-center bg-background/80 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                >
+                  <Camera className="h-6 w-6 text-foreground" />
+                </button>
+              </div>
+              <div className="flex-1 space-y-2">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const url = await uploadAvatar(file);
+                      if (url) {
+                        setAvatarUrl(url);
+                      }
+                    }
+                    e.target.value = '';
+                  }}
+                  className="hidden"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                >
+                  {isUploading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Upload className="mr-2 h-4 w-4" />
+                  )}
+                  Bild hochladen
+                </Button>
+                {isUploading && (
+                  <Progress value={uploadProgress} className="h-2" />
+                )}
+                <p className="text-xs text-muted-foreground">
+                  JPG, PNG, WebP oder GIF. Max. 5 MB.
+                </p>
               </div>
             </div>
 
