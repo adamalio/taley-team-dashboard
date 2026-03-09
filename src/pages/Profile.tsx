@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Loader2, Save, Upload, Camera } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
+import { ImageCropDialog } from '@/components/ImageCropDialog';
 
 const Profile = () => {
   const { user } = useAuth();
@@ -20,6 +21,10 @@ const Profile = () => {
   const [fullName, setFullName] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [bio, setBio] = useState('');
+  
+  // Crop dialog state
+  const [cropDialogOpen, setCropDialogOpen] = useState(false);
+  const [selectedImageSrc, setSelectedImageSrc] = useState<string | null>(null);
 
   useEffect(() => {
     if (profile) {
@@ -32,6 +37,32 @@ const Profile = () => {
       setAvatarUrl(user.user_metadata?.avatar_url || '');
     }
   }, [profile, user]);
+
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Create object URL for cropping
+      const imageUrl = URL.createObjectURL(file);
+      setSelectedImageSrc(imageUrl);
+      setCropDialogOpen(true);
+    }
+    e.target.value = '';
+  };
+
+  const handleCropComplete = async (croppedBlob: Blob) => {
+    // Clean up the object URL
+    if (selectedImageSrc) {
+      URL.revokeObjectURL(selectedImageSrc);
+      setSelectedImageSrc(null);
+    }
+    
+    // Convert blob to file and upload
+    const file = new File([croppedBlob], 'avatar.jpg', { type: 'image/jpeg' });
+    const url = await uploadAvatar(file);
+    if (url) {
+      setAvatarUrl(url);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,16 +132,7 @@ const Profile = () => {
                   ref={fileInputRef}
                   type="file"
                   accept="image/jpeg,image/png,image/webp,image/gif"
-                  onChange={async (e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      const url = await uploadAvatar(file);
-                      if (url) {
-                        setAvatarUrl(url);
-                      }
-                    }
-                    e.target.value = '';
-                  }}
+                  onChange={handleFileSelect}
                   className="hidden"
                 />
                 <Button
@@ -131,7 +153,7 @@ const Profile = () => {
                   <Progress value={uploadProgress} className="h-2" />
                 )}
                 <p className="text-xs text-muted-foreground">
-                  JPG, PNG, WebP oder GIF. Max. 5 MB.
+                  JPG, PNG, WebP oder GIF. Max. 5 MB. Bild wird zugeschnitten.
                 </p>
               </div>
             </div>
@@ -202,6 +224,22 @@ const Profile = () => {
           </form>
         </CardContent>
       </Card>
+
+      {/* Image Crop Dialog */}
+      {selectedImageSrc && (
+        <ImageCropDialog
+          open={cropDialogOpen}
+          onOpenChange={(open) => {
+            setCropDialogOpen(open);
+            if (!open && selectedImageSrc) {
+              URL.revokeObjectURL(selectedImageSrc);
+              setSelectedImageSrc(null);
+            }
+          }}
+          imageSrc={selectedImageSrc}
+          onCropComplete={handleCropComplete}
+        />
+      )}
     </div>
   );
 };
