@@ -131,6 +131,11 @@ const Login = () => {
                   {error}
                 </div>
               )}
+              {success && (
+                <div className="rounded-md bg-primary/10 p-3 text-sm text-primary">
+                  {success}
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="email">E-Mail</Label>
                 <Input
@@ -151,15 +156,35 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  minLength={6}
                 />
               </div>
+              {isRegister && (
+                <div className="space-y-2">
+                  <Label htmlFor="confirmPassword">Passwort bestätigen</Label>
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                    minLength={6}
+                  />
+                </div>
+              )}
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Wird angemeldet..." : "Anmelden"}
+                {loading 
+                  ? (isRegister ? "Wird registriert..." : "Wird angemeldet...") 
+                  : (isRegister ? "Registrieren" : "Anmelden")}
               </Button>
               <p className="text-center text-sm text-muted-foreground">
-                Noch kein Konto?{" "}
-                <span className="cursor-pointer text-primary hover:underline">
-                  Registrieren
+                {isRegister ? "Bereits ein Konto?" : "Noch kein Konto?"}{" "}
+                <span 
+                  className="cursor-pointer text-primary hover:underline"
+                  onClick={() => { setIsRegister(!isRegister); setError(""); setSuccess(""); }}
+                >
+                  {isRegister ? "Anmelden" : "Registrieren"}
                 </span>
               </p>
             </form>
