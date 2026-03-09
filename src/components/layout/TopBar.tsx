@@ -1,8 +1,17 @@
-import { Bell, Search, Menu, Moon, Sun } from "lucide-react";
+import { Bell, Search, Menu, Moon, Sun, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useTheme } from "@/hooks/useTheme";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 interface TopBarProps {
   onMobileMenuToggle: () => void;
@@ -10,6 +19,25 @@ interface TopBarProps {
 
 const TopBar = ({ onMobileMenuToggle }: TopBarProps) => {
   const { theme, toggleTheme } = useTheme();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const getUserInitials = () => {
+    if (!user) return "TU";
+    const name = user.user_metadata?.full_name || user.email || "";
+    if (user.user_metadata?.full_name) {
+      const parts = name.split(" ");
+      return parts.length >= 2 
+        ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+        : name.substring(0, 2).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/login");
+  };
 
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center gap-4 border-b border-border bg-card px-4 md:px-6">
@@ -47,12 +75,37 @@ const TopBar = ({ onMobileMenuToggle }: TopBarProps) => {
           <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-destructive" />
         </Button>
 
-        {/* User avatar */}
-        <Avatar className="h-9 w-9 cursor-pointer">
-          <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
-            TU
-          </AvatarFallback>
-        </Avatar>
+        {/* User avatar with dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Avatar className="h-9 w-9 cursor-pointer">
+              <AvatarImage src={user?.user_metadata?.avatar_url} />
+              <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
+                {getUserInitials()}
+              </AvatarFallback>
+            </Avatar>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <div className="px-2 py-1.5">
+              <p className="text-sm font-medium">
+                {user?.user_metadata?.full_name || "Benutzer"}
+              </p>
+              <p className="text-xs text-muted-foreground truncate">
+                {user?.email}
+              </p>
+            </div>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => navigate("/profile")}>
+              <User className="mr-2 h-4 w-4" />
+              Profil
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={handleSignOut}>
+              <LogOut className="mr-2 h-4 w-4" />
+              Abmelden
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
     </header>
   );
