@@ -83,7 +83,7 @@ const TopBar = ({ onMobileMenuToggle }: TopBarProps) => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Avatar className="h-9 w-9 cursor-pointer">
-              <AvatarImage src={user?.user_metadata?.avatar_url} />
+              <AvatarImage src={getAvatarUrl()} />
               <AvatarFallback className="bg-primary text-primary-foreground text-sm font-semibold">
                 {getUserInitials()}
               </AvatarFallback>
@@ -92,7 +92,7 @@ const TopBar = ({ onMobileMenuToggle }: TopBarProps) => {
           <DropdownMenuContent align="end" className="w-56">
             <div className="px-2 py-1.5">
               <p className="text-sm font-medium">
-                {user?.user_metadata?.full_name || "Benutzer"}
+                {getDisplayName()}
               </p>
               <p className="text-xs text-muted-foreground truncate">
                 {user?.email}
