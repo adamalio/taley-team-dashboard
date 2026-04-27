@@ -1,5 +1,9 @@
 # Welcome to your Lovable project
 
+## Product requirements
+
+- [`docs/PRD.md`](docs/PRD.md)
+
 ## Project info
 
 **URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
