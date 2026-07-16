@@ -3,9 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 
-const DRIVE_FOLDER_ID = "1LH2hbUAfDyZLMoIY9OSZHVj7Btif6TJU";
-const API_KEY = "AIzaSyCwWenwL_CipVC-gpug969dVuJTbirUdn0";
-const CLIENT_ID = "466937052748-fc7mjm4947pcnr9acvq7o60sq87k02km.apps.googleusercontent.com";
+const DRIVE_FOLDER_ID = import.meta.env.VITE_DRIVE_FOLDER_ID || "";
+const API_KEY = import.meta.env.VITE_GOOGLE_API_KEY || "";
+const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
 const SCOPES = "https://www.googleapis.com/auth/drive.file";
 
 let pickerApiLoaded = false;
