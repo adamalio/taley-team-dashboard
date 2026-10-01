@@ -1,3 +1,29 @@
+# Taley Team Dashboard
+
+React/TypeScript team workspace with Supabase login, profiles, tasks, Kanban, chat, forum, statistics and Google Drive document references.
+
+## Start here
+
+```sh
+npm ci
+cp .env.example .env.local
+npm run dev
+```
+
+Use Node.js 22.12+ and npm; the local server is `http://localhost:8080`. Existing Bun lockfiles are preserved, while this guide uses `package-lock.json`.
+
+**Backend note:** Auth currently points to the Supabase project configured in `src/lib/supabase.ts`; `.env.example` configures only Drive. Local development is not an automatic offline demo.
+
+- [Development, configuration and checks](docs/DEVELOPMENT.md)
+- [Product requirements](docs/PRD.md)
+- [Separate internal Taley Dashboard](https://github.com/adamalio/taley-dashboard): independent codebase and rollout instructions.
+
+Run `npm test`, `npm run lint` and `npm run build` before submitting code changes. The Lovable project ID in the original template below is a placeholder, not a verified deployment link.
+
+## Historical project notes
+
+The original README is preserved below. Use the current setup above and the development guide when commands or implementation claims differ.
+
 # Welcome to your Lovable project
 
 ## Product requirements
